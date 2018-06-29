@@ -1,0 +1,113 @@
+//cq 2018/6/25 
+//learn  git
+//https://github.com/
+
+mkdir learngit  //创建一个新的仓库learngit
+cd learngit     //调整当前目录到learngi仓库目录
+pwd          //显示当前目录
+git init  //把该目录变成git可以管理的仓库
+
+换git仓库：使用cd命令把当前目录却换到一个git库的目录下
+命令：cd /C/Users/Administrators/learngit
+然后再操作git命令
+'
+文本编辑器修改等
+点击ESC 进入命令行模式
+vi filename  //直接在目录下新建一个文本，但并没有加入到仓库里
+进入文本编辑，退出方式： ESC进入最后一行后输入":wd“ 保存退出
+或者输入":q" 直接退出
+输入"i"进入编辑模式
+windows操作系统下换行是“enter+换行”，linux和MAC则是直接换行，混淆使用，会扰乱跨平台写作
+因此在VI编辑时，不要直接回车换行，而是要在命令行模式中 点击"o" 来换一行继续输入
+
+//添加文本
+1:git add readme.txt//把文件添加到仓库
+2:git diff readme.txt //查看修改内容
+3：git commit -m "message" //提交到仓库，并输入本次提交的说明
+4：git status  //查看当前仓库的状态，如果有什么修改的话就通过git fiff fileanme 来查看
+5：git log  //命令显示从最近到最远的提交日志git log --pretty=oneline
+6: git reset --hard HEAD^   //把当前版本回退到上一版本，也可以修改HEAD^为commit id号（版本号），还原上个版本
+7:git reflog   //查看历史命令，以便回到未来版本
+8:git rm fileName //删除  对于已经提交到版本库的文件，可以通过git checkout -- filename用版本库里的版本替换工作区的版本，无论
+                   // 工作区是修改还是删除，都可以“一键还原”，但只能恢复文件到最新版本，会丢失最近一次提交后你修改的内容（rm filename 删除文件 或者手动删除）
+9：git checkout -- readm.txt  //丢弃工作区的修改
+10：git reset HEAD readm.txt //把暂存区的修改撤销掉（unstage)
+PS：①如果只是在工作区修改了文件，则可以通过命令 git checkout -- filename 来丢弃工作区的修改
+    ②如果修改后背添加到了暂存区，则要首先通过 git reset HEAD filename 撤销暂存区的修改，
+	然后再通过git checkout -- filename 来把工作区的修改也撤销
+	③如果提交到了版本库，则通过gir reset --hard HEAD^ 回退版本
+	④如果推送到远程库，则没法修改
+
+11：git remote add origin git@github.com:cuiqi0108/learngit.git  //连接本地与远程仓库
+12:  git push -u origin master   //连接完后就可以把本地仓库的所有内容推送到远程库
+                               // 可以删除-u  加入-u目的是为了默认主机（此处为master），后续再推送给远程库就输入　git push 即可
+       git pull  //如果上述推送失败，则因为远程分支比本地更新，通过git pull进行合并，解决冲突后再git push
+	   如果git pull提示no tracking information则说明本地分支和远程分支的链接关系没有创建，用命令git branch --set-upstream-to=origin/dev dev （dev是分支名）
+13:  git clone git@github.com:cuiqi0108/gitskills.git   //克隆远程仓库到本地
+14:  git checkout -b dev   //创建一个新的分支dev (-b意思是创建并切换)
+         git branch dev   //创建分支dev
+		 git checkout dev   //切换到分支dev
+		 git checkout -b dev origin/dev       //创建远程origin的dev分支到本地，
+15： git branch　　　　　　//查看当前分支
+      git merge dev    //将dev分支的修改与目前分支进行合并
+      git branch -d dev    //删除分支dev
+	  
+16： git merge --no-ff -m "merge with no-ff" dev   //“no-ff"是普通合并，合并后的历史有分支，能看出曾经进行过合并
+                                                      //而fast forward （即 git merge dev）在删除分支后会丢掉分支信息
+      git log --graph --pretty=oneline --abbrev-commit  //可以看到分支合并图 
+
+17：命令git branch --set-upstream-to=origin/dev dev建立本地dev和远程仓库dev的链接 这样才能远程仓库把相关修改抓会本机
+        
+
+////远程仓库
+简介：git是本地仓库，github是远程仓库，可以远程提交，但需要SSH key进行识别是否为本人
+生成key的命令为  ssh-keygen -t ras -C "cuiqi0108@163.com"
+如果自己有多个电脑都要提交给远程仓库（别人是可以看到的，但是别人无法修改），则要在github里Add多个Key即可。
+可以把自己写的代码上传到github
+
+①：连接本地与远程仓库
+命令：git remote add origin git@github.com:cuiqi0108/learngit.git
+
+②：连接完后就可以把本地仓库的所有内容推送到远程库
+命令：git push -u origin master
+③：以后在本地修改后都可以通过git push 把本地库推送到GitHub
+优势：没有联网时在本地也是可以操作的，不用考虑远程库的存在，在联网后再把本地提交推送一下就可以完成同步。
+
+④：克隆远程仓库到本地
+首先在github上创建一个仓库，然后输入命令： git clone git@github.com:cuiqi0108/gitskills.git  即可
+PS：Could not read from remote repository
+问题原因是 在git上没有创建SSH KEY
+解决办法是首先在终端输入ssh-keygen -t rsa -C "USERNAME"，三次回车后 输入cat ~/.ssh/id_rsa.pub
+得到SSH KEY值，然后粘贴到自己的git账户中再git clone 即可。
+
+⑤解决冲突
+若两个分支各自都有修改，无法通过指针快速修改，就会引起冲突‘
+可以通过git log --graph --pretty=oneline --abbrev-commit  看到分支合并图
+
+⑥分支管理
+如果通过指针快速合并的方式，在删除分支后容易丢失分支信息 因此有时需要强制禁用 Fast forward
+master分支是稳定的，不能用来干活
+干活时在dev分支上，所有人都有自己的分支，然后用 --no-ff  方式合并到dev分支，最后需要发布新版本时才合并到master
+ git merge --no-ff -m "merge with no-ff" dev
+
+ ⑦BUG分支
+ 在git中，每个bug都要通过一个临时分支来修复，然后合并分支，最后将临时分支删除。但如果还有工作未完成不能提交，则可以通过
+ git stash命令 来储藏 工作现场，等以后通过git stash pop再恢复,回到工作现场。
+ 首先假如要修改的是主线master，则先转到主线，然后再主线上加一条临时分支，在临时分支上修改完毕提交（add + commit )后回到主线
+ 然后普通合并分支(git merge --no-ff -m "merge with no-ff" 临时分支名字 )，后删除临时分支（git branch -d 临时分支名字），就算把bug修复完毕了
+ 最后转到分支dev（你储存的分支-即工作环境），通过git stash list 查看储存的场景(可以是多个，恢复的时候git stash apply stash@{0}   ）
+ 然后通过git stash pop 恢复工作环境，并把stash内容删除（或者先通过git stash apply恢复，再通过git stash drop删除）即可
+ 
+ ⑧ Feature分支
+ 开发一个新的feature，最好新建一个分支，最后选择是否合并到分支dev上。
+ 
+ ⑨多人协作
+ 查看远程库的信息  git remote  或者 git remote -v 显示更详细的信息
+ 使用git push origin master来推送分支master  可以修改分支名字推送不同分支
+ 如果多人协作，大家都会往master和dev上推送自己的修改，如果谁要从远程库clone一份到本地时，默认
+ 只能复制Master分支，要想在dev分支上开发就必须通过命令：git checkout -b dev origin/dev  创建远程origin的dev分支到本地，
+ 之后就可以进行dev上的远程推送了
+ 但是如果别人在dev上修改推送后，自己也修改了相同的文件并推送到dev上就会引起冲突，这时就要先通过命令git pull把冲突文件拉回到本地
+ 在本地进行合并，解决冲突之后再推送。但在git pull之前，要先通过命令git branch --set-upstream-to=origin/dev dev建立本地dev和远程仓库dev的链接
+ 连接成功后再git pull，这时文件已经自动合并好了，然后打开文件，修改后再git add   和 git commit -m "XXX"最后git push origin dev 即可
+ 
